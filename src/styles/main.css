@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gh-background text-gh-text;
+    -webkit-app-region: drag;
+  }
+}
+
+@layer components {
+  .gh-window {
+    @apply fixed inset-0 bg-gh-background backdrop-blur-xs;
+  }
+  
+  .gh-header {
+    @apply flex items-center justify-between p-2 bg-gh-header border-b border-gh-accent/20;
+  }
+  
+  .gh-content {
+    @apply p-4;
+  }
+  
+  .gh-button {
+    @apply px-3 py-1 rounded bg-gh-accent text-gh-primary hover:bg-opacity-80 transition-all;
+  }
+  
+  .gh-input {
+    @apply px-3 py-1 rounded bg-gh-primary/50 border border-gh-accent/30 focus:border-gh-accent focus:outline-none text-gh-text;
+  }
+
+  .gh-text-primary {
+    @apply text-gh-text;
+  }
+
+  .gh-text-secondary {
+    @apply text-gh-text-secondary;
+  }
+} 

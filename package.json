@@ -1,0 +1,48 @@
+{
+  "name": "gh-overlay",
+  "version": "1.0.0",
+  "description": "Galaxy Harvester Overlay Application",
+  "main": "src/main/index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=development electron .",
+    "dev": "cross-env NODE_ENV=development electron .",
+    "build": "electron-builder",
+    "test": "jest",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "build:css": "tailwindcss -i ./src/styles/main.css -o ./src/styles/output.css"
+  },
+  "keywords": [
+    "electron",
+    "overlay",
+    "galaxy-harvester"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@electron/remote": "^2.0.12",
+    "@testing-library/react": "^14.2.1",
+    "autoprefixer": "^10.4.14",
+    "axios": "^1.6.7",
+    "cross-env": "^7.0.3",
+    "electron": "^29.1.0",
+    "electron-builder": "^24.13.3",
+    "electron-store": "^8.2.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "keytar": "^7.9.0",
+    "postcss": "^8.4.24",
+    "prettier": "^3.2.5",
+    "tailwindcss": "^3.3.2"
+  },
+  "build": {
+    "appId": "com.gh-overlay.app",
+    "productName": "GH Overlay",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  }
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>GH Overlay</title>
+    <style>
+        /* Base styles to ensure visibility while Tailwind loads */
+        body {
+            background-color: #1a1b26;
+            color: #c0caf5;
+            margin: 0;
+            padding: 0;
+            -webkit-app-region: drag; /* Make entire window draggable by default */
+        }
+        #app {
+            background-color: rgba(26, 27, 38, 0.95);
+            min-height: 100vh;
+        }
+        .gh-header {
+            background-color: rgba(26, 27, 38, 0.98);
+            padding: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(122, 162, 247, 0.2);
+            -webkit-app-region: drag; /* Ensure header is draggable */
+        }
+        .gh-content {
+            padding: 1rem;
+        }
+        /* Make buttons and interactive elements non-draggable */
+        button, input, a {
+            -webkit-app-region: no-drag;
+        }
+    </style>
+    <link href="../../src/styles/output.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app" class="gh-window">
+        <div class="gh-header">
+            <h1 class="text-lg font-semibold gh-text-primary">GH Overlay</h1>
+            <div class="flex gap-2 text-sm">
+                <span class="click-through-status gh-text-secondary">Click-through: Off</span>
+                <span class="gh-text-secondary">Alt+V: Toggle Visibility</span>
+                <span class="gh-text-secondary">Alt+C: Toggle Click-through</span>
+            </div>
+        </div>
+        <div class="gh-content">
+            <div class="text-sm gh-text-primary">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+    <script src="./index.js"></script>
+</body>
+</html> 
