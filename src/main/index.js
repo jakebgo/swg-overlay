@@ -85,6 +85,14 @@ function createWindow() {
       mainWindow.setIgnoreMouseEvents(true, { forward: true });
     }
   });
+
+  // Handle click-through toggle from renderer
+  ipcMain.on('toggle-click-through', () => {
+    const newState = !windowStore.getClickThrough();
+    windowStore.setClickThrough(newState);
+    mainWindow.setIgnoreMouseEvents(newState, { forward: true });
+    mainWindow.webContents.send('click-through-toggled', newState);
+  });
 }
 
 app.whenReady().then(() => {

@@ -1,6 +1,15 @@
+// Register Babel to handle JSX
+require('@babel/register')({
+  extensions: ['.js', '.jsx'],
+  presets: ['@babel/preset-env', '@babel/preset-react']
+});
+
 // Import required modules
 const { ipcRenderer } = require('electron');
 const { themeStore } = require('../main/store');
+const React = require('react');
+const { createRoot } = require('react-dom/client');
+const App = require('./App');
 
 // Initialize remote module
 require('@electron/remote/renderer');
@@ -75,4 +84,14 @@ document.addEventListener('keydown', (e) => {
       currentWindow.show();
     }
   }
-}); 
+  
+  // Alt+C to toggle click-through
+  if (e.altKey && e.key === 'C' && currentWindow) {
+    ipcRenderer.send('toggle-click-through');
+  }
+});
+
+// Create root and render the App component
+const container = document.getElementById('app');
+const root = createRoot(container);
+root.render(React.createElement(App)); 

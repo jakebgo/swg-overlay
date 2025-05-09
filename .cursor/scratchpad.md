@@ -194,11 +194,11 @@ This project aims to create a lean MVP of a Galaxy Harvester overlay app with em
   - [x] Install Dependencies
   - [x] Configure Project
 
-- [ ] Phase 1: Core Window & UI Shell
+- [x] Phase 1: Core Window & UI Shell
   - [x] Main Window Setup
   - [x] State Store Implementation
-  - [ ] UI Framework
-  - [ ] Global Hotkeys
+  - [x] UI Framework
+  - [x] Global Hotkeys
 
 - [ ] Phase 2: Embedded GH Login
   - [ ] Login Window
@@ -249,29 +249,32 @@ Completed Phase 1 tasks:
    - Implemented clean, modern styling with proper transparency
 
 2. State Store Implementation:
-   - Created store.js with electron-store configuration
-   - Implemented window state persistence (position, size, visibility, click-through)
-   - Added theme management (dark/light mode, opacity)
-   - Added settings management (poll interval, last poll time)
-   - Integrated store with main and renderer processes
-   - Added window bounds persistence on move/resize
-   - Implemented theme application in renderer
+   - Configured electron-store for persistent settings
+   - Implemented theme and opacity settings
+   - Added window position/size persistence
 
 3. UI Framework:
-   - Set up Tailwind CSS with custom configuration
-   - Created base styles and component classes
-   - Implemented responsive layout structure
-   - Added custom color scheme and theme variables
-   - Created reusable component classes for buttons and inputs
-   - Implemented proper window dragging regions
-   - Added shortcut indicators in the header
-   - Fixed CSS loading and styling issues
-   - Implemented proper window dragging with click-through toggle
+   - Created React-based App component
+   - Implemented resource table with Tailwind styling
+   - Added status bar with last update time
+   - Implemented click-through status indicator
+   - Added keyboard shortcut hints
+   - Created base styles for consistent appearance
+   - Set up proper window dragging regions
+   - Added fade transitions for smooth updates
 
-Ready to proceed with Global Hotkeys task.
+4. Global Hotkeys:
+   - Implemented Alt+V for visibility toggle
+   - Implemented Alt+C for click-through toggle
+   - Added global shortcut registration in main process
+   - Added IPC handlers for renderer-initiated toggles
+   - Persisted shortcut states in windowStore
+   - Added visual feedback in UI for current states
+
+Next task: Begin Phase 2 - Embedded GH Login
 
 ## Executor's Feedback or Assistance Requests
-No immediate assistance needed. Ready to proceed with Global Hotkeys implementation.
+No immediate assistance needed. Ready to proceed with Phase 2 implementation.
 
 ## Lessons
 - Include info useful for debugging in the program output
@@ -286,4 +289,7 @@ No immediate assistance needed. Ready to proceed with Global Hotkeys implementat
 - Keep the color scheme consistent by using custom theme colors in tailwind.config.js
 - Use backdrop-blur for better readability of transparent windows
 - When using -webkit-app-region: drag, make sure to set -webkit-app-region: no-drag for interactive elements
-- Use inline styles as a fallback while Tailwind CSS is loading to prevent FOUC (Flash of Unstyled Content) 
+- Use inline styles as a fallback while Tailwind CSS is loading to prevent FOUC (Flash of Unstyled Content)
+- When implementing global shortcuts in Electron, register them in the main process and use IPC for communication with the renderer
+- Store shortcut states in electron-store to persist them across app restarts
+- Provide visual feedback in the UI for the current state of toggles 
