@@ -20,6 +20,9 @@ const store = new Store({
     settings: {
       pollInterval: 300000, // 5 minutes in milliseconds
       lastPollTime: null
+    },
+    auth: {
+      ghCookie: null
     }
   }
 });
@@ -59,8 +62,21 @@ const settingsStore = {
   setLastPollTime: (timestamp) => store.set('settings.lastPollTime', timestamp)
 };
 
+// Auth management
+const authStore = {
+  getGhCookie: () => store.get('auth.ghCookie'),
+  setGhCookie: (cookie) => store.set('auth.ghCookie', cookie),
+  deleteGhCookie: () => store.delete('auth.ghCookie'),
+  hasValidCookie: () => {
+    const cookie = store.get('auth.ghCookie');
+    if (!cookie) return false;
+    return cookie.expirationDate > Date.now();
+  }
+};
+
 module.exports = {
   windowStore,
   themeStore,
-  settingsStore
+  settingsStore,
+  authStore
 }; 

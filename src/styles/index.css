@@ -3,20 +3,127 @@ body {
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  overflow: hidden;
+  overflow: auto;
+  min-width: 0;
+  box-sizing: border-box;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+body::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 #app {
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+#app::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbars in table containers too */
+.table-container {
+  position: relative;
+  overflow-y: auto;
+  max-height: calc(100vh - 300px); /* Adjust based on your header height */
+  overflow-x: auto;
+  width: 100%;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.table-container::-webkit-scrollbar {
+  display: none;
+}
+
+.table-container table {
+  width: 100%;
+}
+
+.table-container thead {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background-color: #374151;
+}
+
+.table-container th {
+  background-color: #374151;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* Header styles */
 .gh-header {
   -webkit-app-region: drag;
   user-select: none;
+  padding: 12px 16px;
+}
+
+.header-row {
+  margin-bottom: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-item {
+  margin: 0 24px;
+}
+
+/* Sticky filter controls and table header */
+.sticky-controls {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: rgba(31, 41, 55, 0.95);
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+  .header-item {
+    margin: 0 12px;
+  }
+  
+  .header-row > div:first-child {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 640px) {
+  .header-item {
+    margin: 0 8px;
+  }
+  
+  .header-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .header-row > * {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+.header-row:last-child {
+  margin-bottom: 0;
 }
 
 /* Table styles */
@@ -35,6 +142,65 @@ th, td {
 .status-bar {
   -webkit-app-region: drag;
   user-select: none;
+}
+
+/* Dropdown styles */
+select {
+  color: white !important;
+  background-color: #374151 !important;
+  border: 1px solid #4B5563;
+  font-weight: 500;
+}
+
+select option {
+  background-color: #374151;
+  color: white;
+  font-weight: 500;
+  padding: 6px;
+}
+
+/* Ensure dropdown menus don't get too long */
+select[multiple], 
+select.dropdown-large {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Custom styling for server dropdown */
+select.header-item {
+  padding: 6px 10px;
+}
+
+/* Ensure dropdown options are readable */
+@media (prefers-color-scheme: dark) {
+  select option {
+    background-color: #1F2937;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  select option {
+    background-color: #F3F4F6;
+    color: #1F2937;
+  }
+}
+
+/* Responsive table */
+@media (max-width: 640px) {
+  .responsive-table-header th {
+    padding: 4px;
+  }
+  
+  td {
+    padding: 8px 4px;
+  }
+}
+
+/* Make header elements drag-resistant */
+.gh-header button,
+.gh-header select,
+.gh-header a {
+  -webkit-app-region: no-drag;
 }
 
 /* Transitions */

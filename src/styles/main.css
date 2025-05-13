@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-gh-background text-gh-text;
+    @apply bg-gh-background text-gh-text overflow-auto;
     -webkit-app-region: drag;
   }
 }
@@ -15,7 +15,9 @@
   }
   
   .gh-header {
-    @apply flex items-center justify-between p-2 bg-gh-header border-b border-gh-accent/20;
+    @apply flex flex-col gap-2 p-3 bg-gh-header border-b border-gh-accent/20;
+    -webkit-app-region: drag;
+    user-select: none;
   }
   
   .gh-content {
@@ -37,4 +39,70 @@
   .gh-text-secondary {
     @apply text-gh-text-secondary;
   }
+
+  .header-container {
+    @apply flex flex-col gap-2;
+  }
+  
+  .header-row {
+    @apply flex flex-wrap items-center justify-between mb-2;
+  }
+  
+  .header-item {
+    @apply mx-6 whitespace-nowrap;
+  }
+  
+  .header-dropdown {
+    @apply bg-slate-700 text-white border border-slate-600 rounded;
+  }
+  
+  /* Make header elements drag-resistant */
+  .gh-header button,
+  .gh-header select,
+  .gh-header a {
+    @apply -webkit-app-region-no-drag;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .header-item {
+      @apply mx-3;
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .header-row {
+      @apply flex-col items-start;
+    }
+    
+    .header-row > * {
+      @apply w-full mb-2;
+    }
+    
+    .header-item {
+      @apply mx-0 my-1;
+    }
+  }
+}
+
+/* Custom styles */
+.gh-text-primary {
+  color: #c0caf5;
+}
+
+.gh-text-secondary {
+  color: #7aa2f7;
+}
+
+.gh-header {
+  background-color: rgba(26, 27, 38, 0.98);
+}
+
+.gh-window {
+  background-color: rgba(26, 27, 38, 0.95);
+}
+
+/* Custom webkit property */
+.-webkit-app-region-no-drag {
+  -webkit-app-region: no-drag;
 } 

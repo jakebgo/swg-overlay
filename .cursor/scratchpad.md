@@ -1,295 +1,131 @@
-# SWG-Overlay Implementation Plan
+# Galaxy Harvester Overlay Project
 
 ## Background and Motivation
-This project aims to create a lean MVP of a Galaxy Harvester overlay app with embedded login functionality. The overlay will provide real-time resource information in a transparent, always-on-top window that can toggle click-through capability, allowing users to interact with the game when needed.
+The Galaxy Harvester Overlay is a desktop application designed to provide real-time resource information from Galaxy Harvester (gh.swganh.org) in an overlay format. This tool will help players track resource locations and availability without constantly switching between the game and the browser.
 
 ## Key Challenges and Analysis
-1. **Secure Authentication**: Need to securely store and manage GH login cookies using keytar.
-2. **Optimal Update Frequency**: Balance freshness of data with server load (min 5 min interval with jitter).
-3. **Resource Diffing**: Only update UI when resource data actually changes to minimize IPC overhead.
-4. **Window Management**: Create a frameless, transparent, click-through-capable window that doesn't interfere with gameplay.
-5. **Robustness**: Handle network errors, authentication failures, and ensure graceful shutdown.
+1. Cookie Management
+   - Need to handle gh_sid cookie for authentication
+   - Must manage cookie expiration and renewal
+   - Need to securely store and handle session data
+
+2. Data Synchronization
+   - Real-time updates from Galaxy Harvester
+   - Efficient data caching and refresh mechanisms
+   - Handling offline scenarios and reconnection
+
+3. UI/UX Considerations
+   - Non-intrusive overlay design
+   - Clear resource information display
+   - Easy access to login and settings
+   - Ensure complete server list availability
+
+4. Quality Filtering Refinement
+   - Need to properly identify and extract the quality metric from Galaxy Harvester HTML
+   - UI for quality filter needs improvement - should be a dropdown option rather than separate controls
+   - Need to ensure server-side sorting works correctly with quality
 
 ## High-level Task Breakdown
+1. Project Setup and Basic Structure
+   - [x] Initialize Electron project
+   - [x] Set up basic window management
+   - [x] Implement click-through functionality
+   - [x] Create basic UI layout
 
-### Phase 0 — Environment & Scaffold (½ day)
-1. **Project Initialization**
-   - Create Electron project structure using create-electron
-   - Create .npmrc with electron_mirror if behind company proxy
-   - Set "type": "module" in package.json if using native ESM
-   - Success criteria: Project initializes without errors, basic electron app runs
+2. Authentication System
+   - [x] Implement cookie detection
+   - [x] Create login modal
+   - [x] Handle authentication state
+   - [x] Display login status and expiration
+   - [ ] Implement automatic session refresh
 
-2. **Install Dependencies**
-   - Install all required dependencies including electron-store, keytar, axios, etc.
-   - Install development dependencies: jest, testing-library, eslint, prettier, etc.
-   - Success criteria: All dependencies install without conflicts
+3. Resource Data Integration
+   - [x] Set up Galaxy Harvester data fetching
+   - [x] Implement resource data parsing
+   - [x] Refine parsing logic for direct-fetch snippet (now targeting resourceBox divs)
+   - [x] Create resource display table
+   - [x] Add resource filtering and sorting
+   - [x] Expand server dropdown to include all Galaxy Harvester servers
 
-3. **Configure Project**
-   - Add npm scripts (dev, test, lint, package)
-   - Create initial folder structure
-   - Success criteria: Project structure follows best practices, npm scripts work correctly
+4. UI/UX Implementation
+   - [x] Design and implement overlay window
+   - [x] Create resource information display
+   - [x] Improve server dropdown styling
+   - [ ] Add settings panel
+   - [ ] Implement keyboard shortcuts
 
-### Phase 1 — Core Window & UI Shell (1 day)
-1. **Main Window Setup**
-   - Create transparent, frameless, always-on-top window
-   - Implement click-through functionality
-   - Add Ctrl+Drag override or small non-click-through header region for window dragging when setIgnoreMouseEvents is active
-   - Success criteria: Window displays correctly with transparency and proper z-index, can be repositioned even when click-through is enabled
-
-2. **State Store Implementation**
-   - Configure electron-store for persistent settings
-   - Store window position/size and theme preferences
-   - Success criteria: Settings persist across application restarts
-
-3. **UI Framework**
-   - Create basic App component with Tailwind styling
-   - Implement resource table structure and status bar
-   - Success criteria: UI renders correctly with placeholder content
-
-4. **Global Hotkeys**
-   - Implement toggle visibility (Ctrl+Shift+Alt+V)
-   - Implement click-through toggle (Ctrl+Shift+Alt+R)
-   - Success criteria: Hotkeys correctly trigger their respective actions
-
-### Phase 2 — Embedded GH Login (1.5 days)
-1. **Login Window**
-   - Create isolated BrowserWindow for GH login
-   - Configure window persistence and security settings
-   - Success criteria: Login window loads GH login page correctly
-
-2. **IPC Handlers**
-   - Implement openGhLogin and clearGhCookie IPC handlers
-   - Set up communication between main and renderer processes
-   - Capture and store cookie expiry/expirationDate
-   - Success criteria: IPC handlers correctly perform their functions and respond
-
-3. **Login UI Component**
-   - Create GHLoginWizard modal component
-   - Implement sign-in flow and status indicators
-   - Surface "expires in X days" in UI so users aren't surprised by sudden logouts
-   - Success criteria: Login modal displays correctly and responds to authentication events, shows clear expiration information
-
-4. **Authentication Service**
-   - Implement cookie storage using keytar
-   - Add helper methods for retrieving/clearing credentials
-   - Add fallback to electron-store AES encryption if keytar fails
-   - Success criteria: Cookies are securely stored and can be retrieved/cleared, with graceful fallback if keytar fails
-
-5. **Auth Error Handling**
-   - Implement detection of 401/403 errors
-   - Trigger re-authentication flow when needed
-   - Success criteria: Application detects authentication failures and prompts for re-login
-
-### Phase 3 — Data Fetch & Processing (1 day)
-1. **Galaxy Client**
-   - Implement Axios-based API client for GH
-   - Configure proper headers and authentication
-   - Success criteria: Client successfully fetches resource data from GH
-
-2. **Polling Implementation**
-   - Set up timed polling with configurable interval
-   - Add random jitter to prevent server hammering
-   - Validate and clamp polling intervals to minimum 5 minutes
-   - Success criteria: Polling occurs at expected intervals with appropriate jitter
-
-3. **XML Parsing**
-   - Implement XML to JS object conversion
-   - Handle potential parsing errors
-   - Success criteria: XML data correctly transforms into usable JavaScript objects
-
-4. **Change Detection**
-   - Implement SHA-256 hashing for quick comparison
-   - Create diffing algorithm to identify changes
-   - Persist latest hash in store to skip unnecessary parsing and diffing if hash unchanged
-   - Success criteria: System correctly identifies added, updated, and removed resources while minimizing processing overhead
-
-5. **Data Caching**
-   - Implement disk caching for resource dumps
-   - Place dumps under %APPDATA%/SWGOverlay/cache/ with 30MB cap
-   - Add fallback mechanism for offline use
-   - Success criteria: Cache properly stores and retrieves data, old caches get purged, total cache size stays within limits
-
-6. **Renderer Updates**
-   - Send differential updates to renderer
-   - Update resource table efficiently
-   - Success criteria: UI updates reflect actual data changes without full re-renders
-
-### Phase 4 — Galaxy Management & Settings (½ day)
-1. **Galaxy Configuration**
-   - Create static galaxies.json with server information
-   - Implement galaxy selection dropdown
-   - Load galaxies.json lazily; fetch live server list once a day and merge with local list
-   - Success criteria: Users can select different galaxies including newly added ones without application updates
-
-2. **Settings Panel**
-   - Create settings UI for configuring app behavior
-   - Implement theme switching, poll interval adjustment, etc.
-   - Success criteria: Settings changes immediately affect app behavior and persist
-
-3. **Data Freshness Indicators**
-   - Add visual indicators for data staleness
-   - Implement color-coding based on age of data
-   - Success criteria: UI clearly shows how fresh the displayed data is
-
-### Phase 5 — Robustness & Polish (1 day)
-1. **Rate Limiting**
-   - Implement safeguards against excessive polling
-   - Add user warnings for potentially problematic settings
-   - Re-validate polling intervals at startup
-   - Success criteria: App prevents configurations that could lead to rate limiting
-
-2. **Graceful Shutdown**
-   - Ensure timers and connections close properly
-   - Cancel in-flight requests on exit
-   - Success criteria: App exits cleanly without resource leaks
-
-3. **Performance Testing**
-   - Test IPC payload sizes with large data dumps
-   - Optimize for performance bottlenecks
-   - Success criteria: App handles large data sets without performance degradation
-
-4. **Unit Testing**
-   - Create tests for authentication, validation, and diffing
-   - Add min-interval validator test (for 5-min guard)
-   - Add test for <10 MB IPC payload size
-   - Set up CI pipeline for automated testing
-   - Success criteria: Test suite passes and covers critical functionality
-
-5. **Mock Server**
-   - Create tools/mock-gh.js for E2E testing
-   - Simulate various server conditions and responses
-   - Success criteria: Mock server properly simulates the GH API for testing
-
-### Phase 6 — Package & Ship (½ day)
-1. **Packaging Configuration**
-   - Update package.json for proper build settings
-   - Configure NSIS installer options
-   - Success criteria: Build configuration correctly generates distributable packages
-
-2. **Assets and Branding**
-   - Add application icon and branding
-   - Bundle default light & dark icon
-   - Create Windows 11 monochrome glyph in 32×32 for Start menu tiles
-   - Configure proper app metadata
-   - Success criteria: Application has appropriate branding and identification on all platforms
-
-3. **Verification**
-   - Test installer on clean virtual machine
-   - Verify uninstallation removes all traces
-   - Success criteria: Installation and uninstallation work correctly on a clean system
-
-## Risk Register
-| Risk | Mitigation |
-|------|------------|
-| GH CAPTCHA changes | Login is human-solved, so still safe. Keep manual cookie UI as hidden fallback. |
-| Keytar install fails on some PCs | Fall back to electron-store AES encryption with user warning about reduced security. |
-| Polling hammer if user edits config.json manually | Re-validate at startup; clamp values below 5 min to safe defaults. |
-| Cookie expiration surprises | Store and display expiration date prominently. |
-| Large resource dumps causing performance issues | Implement payload size checks and optimize data transfer between processes. |
-| User unable to move window when click-through enabled | Provide Ctrl+Drag override and/or non-click-through header region. |
+5. Testing and Optimization
+   - [ ] Write unit tests
+   - [ ] Perform integration testing
+   - [ ] Optimize performance
+   - [ ] Handle edge cases
 
 ## Project Status Board
-- [x] Phase 0: Environment & Scaffold
-  - [x] Project Initialization
-  - [x] Install Dependencies
-  - [x] Configure Project
-
-- [x] Phase 1: Core Window & UI Shell
-  - [x] Main Window Setup
-  - [x] State Store Implementation
-  - [x] UI Framework
-  - [x] Global Hotkeys
-
-- [ ] Phase 2: Embedded GH Login
-  - [ ] Login Window
-  - [ ] IPC Handlers
-  - [ ] Login UI Component
-  - [ ] Authentication Service
-  - [ ] Auth Error Handling
-
-- [ ] Phase 3: Data Fetch & Processing
-  - [ ] Galaxy Client
-  - [ ] Polling Implementation
-  - [ ] XML Parsing
-  - [ ] Change Detection
-  - [ ] Data Caching
-  - [ ] Renderer Updates
-
-- [ ] Phase 4: Galaxy Management & Settings
-  - [ ] Galaxy Configuration
-  - [ ] Settings Panel
-  - [ ] Data Freshness Indicators
-
-- [ ] Phase 5: Robustness & Polish
-  - [ ] Rate Limiting
-  - [ ] Graceful Shutdown
-  - [ ] Performance Testing
-  - [ ] Unit Testing
-  - [ ] Mock Server
-
-- [ ] Phase 6: Package & Ship
-  - [ ] Packaging Configuration
-  - [ ] Assets and Branding
-  - [ ] Verification
+- [x] Basic window setup with click-through
+- [x] Login modal implementation
+- [x] Cookie detection and authentication
+- [x] Login status display with expiration
+- [x] Resource data fetching
+- [x] Resource table implementation
+- [x] Resource filtering and sorting
+- [x] Refine resource parsing logic for direct HTTP snippet
+- [x] Add initial quality filtering for "Top Current Resources"
+- [x] Expand server dropdown to include all Galaxy Harvester servers
+- [x] Improve server dropdown styling and usability
+- [ ] Refine quality calculation for accuracy
+- [ ] Improve quality filter UI integration
+- [ ] Settings panel
+- [ ] Keyboard shortcuts
+- [ ] Testing suite
 
 ## Current Status / Progress Tracking
-Completed Phase 0 tasks:
-1. Project initialized with Electron
-2. Basic project structure created
-3. Dependencies installed and configured
-4. Development environment set up with ESLint, Prettier, and Jest
-
-Completed Phase 1 tasks:
-1. Main Window Setup:
-   - Created transparent, frameless, always-on-top window
-   - Implemented click-through functionality with Alt+C shortcut
-   - Added window dragging capability with semi-transparent header
-   - Added visibility toggle with Alt+V shortcut
-   - Added helpful shortcut indicators in the header
-   - Implemented clean, modern styling with proper transparency
-
-2. State Store Implementation:
-   - Configured electron-store for persistent settings
-   - Implemented theme and opacity settings
-   - Added window position/size persistence
-
-3. UI Framework:
-   - Created React-based App component
-   - Implemented resource table with Tailwind styling
-   - Added status bar with last update time
-   - Implemented click-through status indicator
-   - Added keyboard shortcut hints
-   - Created base styles for consistent appearance
-   - Set up proper window dragging regions
-   - Added fade transitions for smooth updates
-
-4. Global Hotkeys:
-   - Implemented Alt+V for visibility toggle
-   - Implemented Alt+C for click-through toggle
-   - Added global shortcut registration in main process
-   - Added IPC handlers for renderer-initiated toggles
-   - Persisted shortcut states in windowStore
-   - Added visual feedback in UI for current states
-
-Next task: Begin Phase 2 - Embedded GH Login
+- Basic application structure is complete
+- Login system is functional with cookie detection
+- Login status display is implemented with expiration time
+- Resource data fetching and parsing is implemented
+- Direct HTTP fetch updated to GET with query parameters to get time-view listing
+- parseResourceData now targets div.resourceBox elements in table.resourceStats and extracts name, planet, amount, and quality
+- parseResourceData now extracts amount from inlineBlock[2] and quality from inlineBlock[3]
+- Resource table display is functional
+- UI is responsive and follows modern design principles
+- Resource filtering and sorting implemented in renderer UI
+- Category and planet extraction corrected using href slug
+- Spawn list parsing needs implementation; added debug logs for spawn row HTML
+- Enhanced resource parsing to extract:
+  - Multiple planets from planetBar (available planets are shown with classes)
+  - Actual stat values with percentages from the resAttr table
+- Updated UI to display multiple planets and format stat values with percentages
+- Quality filtering for "Top Current Resources" has been removed as requested:
+  - Removed quality extraction in the parseResourceData function
+  - Removed quality column from the resource table
+  - Removed ability to sort by quality
+  - Removed checkbox to filter by quality and configurable threshold
+  - Removed quality-related code from both App.js and resourceService.js
+- Server dropdown updated to include all Galaxy Harvester servers:
+  - Added all servers from the Galaxy Harvester website (33 additional servers)
+  - Implemented better dropdown styling to handle the expanded list
+  - Added CSS improvements for better readability and usability of the dropdown
+  - Used sequential IDs starting from 121 for new servers (existing ones use 118-120)
+- Next steps: Address any remaining UI/UX considerations or feature enhancements
 
 ## Executor's Feedback or Assistance Requests
-No immediate assistance needed. Ready to proceed with Phase 2 implementation.
+- The server dropdown has been expanded to include all Galaxy Harvester servers.
+- Server IDs were assigned sequentially (121-153) for added servers since actual Galaxy Harvester server IDs couldn't be determined.
+- CSS styling was improved to make the dropdown more usable with the larger list of servers.
+- Please verify that:
+  1. The server dropdown now shows all available servers from Galaxy Harvester
+  2. The dropdown styling is readable and usable
+  3. Server selection works correctly
+- If there are any issues with the implementation or if you know the actual server IDs that should be used, please let me know.
 
 ## Lessons
 - Include info useful for debugging in the program output
-- Read files before attempting to edit them
-- Run npm audit before proceeding if vulnerabilities appear in the terminal
+- Read the file before you try to edit it
+- If there are vulnerabilities that appear in the terminal, run npm audit before proceeding
 - Always ask before using the -force git command
-- When creating a new Electron project, it's better to initialize with npm init first and then add dependencies manually rather than using create-electron
-- Keep keyboard shortcuts simple and intuitive (Alt + single key) for better user experience
-- Display keyboard shortcuts in the UI to help users remember them
-- When setting up Tailwind CSS in an Electron app, make sure to configure the content paths correctly in tailwind.config.js to include all template files
-- Use @layer components to create reusable component classes that can be easily maintained and modified
-- Keep the color scheme consistent by using custom theme colors in tailwind.config.js
-- Use backdrop-blur for better readability of transparent windows
-- When using -webkit-app-region: drag, make sure to set -webkit-app-region: no-drag for interactive elements
-- Use inline styles as a fallback while Tailwind CSS is loading to prevent FOUC (Flash of Unstyled Content)
-- When implementing global shortcuts in Electron, register them in the main process and use IPC for communication with the renderer
-- Store shortcut states in electron-store to persist them across app restarts
-- Provide visual feedback in the UI for the current state of toggles 
+- When handling dates in JavaScript, ensure proper conversion between seconds and milliseconds for timestamps
+- Use clear visual indicators for authentication status
+- Implement proper error handling for cookie operations
+- Use cheerio for HTML parsing in Node.js applications
+- Implement proper error handling for network requests
+- When implementing dropdowns with many options, provide proper styling for usability 

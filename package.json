@@ -20,8 +20,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cheerio": "^1.0.0",
+    "node-fetch": "^2.7.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
@@ -29,9 +32,10 @@
     "@babel/preset-react": "^7.23.3",
     "@babel/register": "^7.23.7",
     "@electron/remote": "^2.0.12",
-    "@testing-library/react": "^14.2.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^14.3.1",
     "autoprefixer": "^10.4.14",
-    "axios": "^1.6.7",
+    "axios": "^1.9.0",
     "cross-env": "^7.0.3",
     "electron": "^29.1.0",
     "electron-builder": "^24.13.3",
