@@ -5,8 +5,8 @@ A transparent overlay application for Galaxy Harvester that provides real-time r
 ## Features
 
 - Transparent, always-on-top window
-- Click-through capability (toggle with Ctrl+Shift+Alt+R)
-- Visibility toggle (Ctrl+Shift+Alt+V)
+- Click-through capability (toggle with Alt+C)
+- Visibility toggle (Alt+V)
 - Secure authentication with Galaxy Harvester
 - Real-time resource updates
 - Minimal resource usage
